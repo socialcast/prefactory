@@ -1,8 +1,8 @@
-# RspecHasPrefactory
+# Prefactory
 
 The ease of factories, the performance of fixtures.
 
-RspecHasPrefactory builds your Factory object graph before the start of
+Prefactory builds your Factory object graph before the start of
 the suite due to rspec's before :all, and then any data changes that
 occur during a specific test are automatically rolled back.
 
@@ -10,7 +10,7 @@ occur during a specific test are automatically rolled back.
 
 Add this line to your application's Gemfile:
 
-``` 
+```  ruby
 gem 'prefactory'
 ```
 
@@ -19,7 +19,7 @@ Add this to your `spec_helper.rb`
 ``` ruby
 RSpec.configure do |config|
   config.extend RSpecAroundAll
-  config.include RspecHasPrefactory
+  config.include Prefactory
 end
 ```
 
@@ -33,7 +33,7 @@ describe User do
   end
   context 'a new user has no friends' do
     it { user.friends.count.should == 0 }
-    context 'after adding friends a user has friends' do
+    context 'after adding a friend a user has friends' do
       before { user.add_friend(friend) }
       it { user.friends.count.should == 1 }
     end
