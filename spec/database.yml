@@ -1,0 +1,4 @@
+sqlite:
+  adapter: sqlite3
+  database: spec/<%= ENV['NO_PREFACTORY'] ? 'no_' : '' %>prefactory.sqlite3
+

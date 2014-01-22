@@ -18,9 +18,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'rspec_around_all', '~> 0.1'
+  spec.add_dependency 'rspec_around_all', '~> 0'
+  spec.add_dependency 'activerecord', '~> 4'
+  spec.add_dependency 'sqlite3', '~> 1'
 
   spec.add_development_dependency 'bundler', '~> 1'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'socialcast-git-extensions', '~> 3'
+  spec.add_development_dependency 'debugger', '~> 1'
 end
