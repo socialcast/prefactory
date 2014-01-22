@@ -29,15 +29,21 @@ end
 
 describe "Transactional wrapping" do
   shared_examples_for "synthetic after_commit" do
-    it "calls after commit at this open transaction level, but not above" do
+    it "calls after_commit hooks at this open transaction level, but not above" do
       blog = Blog.create! :title => 'foo'
       blog.called_after_commit.should == 1
+      blog.reload.title.should == 'foo'
+
       blog.update_attributes! :title => 'bar'
       blog.called_after_commit.should == 2
+      blog.reload.title.should == 'bar'
+
       ActiveRecord::Base.connection.transaction(:requires_new => true) do
         blog.update_attributes! :title => 'quux'
         blog.called_after_commit.should == 2
       end
+      blog.reload.title.should == 'quux'
+
       blog.called_after_commit.should == 3
       ActiveRecord::Base.connection.transaction(:requires_new => true) do
         blog.update_attributes! :title => 'ragz'
@@ -45,7 +51,36 @@ describe "Transactional wrapping" do
         raise ActiveRecord::Rollback
       end
       blog.called_after_commit.should == 3
+      blog.reload.title.should == 'quux'
     end
+
+    it "does not call after_commit hooks when an error is raised" do
+      blog = Blog.create! :title => 'foo'
+      blog.called_after_commit.should == 1
+
+      # raise the level at which a synthetic commit should take place
+      Blog.with_disposable_transaction do
+        blog.update_attributes! :title => 'ragz'
+        blog.called_after_commit.should == 2
+      end
+
+      # raise the level at which a synthetic commit should take place
+      Blog.with_disposable_transaction do
+        expect do
+          ActiveRecord::Base.connection.transaction(:requires_new => true) do
+            blog.update_attributes! :title => 'ragz'
+            blog.called_after_commit.should == 2
+            raise "Something blows up"
+          end
+        end.to raise_error("Something blows up")
+        blog.called_after_commit.should == 2
+        blog.reload.title.should == 'foo'
+      end
+
+      blog.called_after_commit.should == 2
+      blog.reload.title.should == 'foo'
+    end
+
   end
 
   it "wraps describe blocks in a savepoint transaction" do
