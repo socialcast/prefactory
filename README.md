@@ -51,5 +51,5 @@ end
 
 ## Copyright
 
-Copyright (c) 2012-2013 Myron Marston. Released under the terms of the
-MIT license. See LICENSE for details.
+Copyright (c) 2012-2014 VMware, Inc. All Rights Reserved.
+Released under the terms of the MIT license. See LICENSE for details.
