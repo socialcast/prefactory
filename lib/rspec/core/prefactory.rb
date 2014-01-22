@@ -1,27 +1,7 @@
-require 'prefactory/version'
-require 'prefactory/after_commit_support'
+require 'prefactory/active_record_integration'
 require 'rspec_around_all'
 
 module Prefactory
-  module ActiveRecordExtension
-    # do a transaction with a silent rollback, unless another
-    # exception is doing a loud rollback already.
-    # Also, hook into after_commit.rb to trigger commit logic for any transaction above this open-transaction level.
-    def with_disposable_transaction(&block)
-      return_value = nil
-      ActiveRecord::Base.connection.transaction(:requires_new => true) do
-        ActiveRecord::Base.connection.commit_at_open_transaction_level = ActiveRecord::Base.connection.open_transactions
-        begin
-          return_value = yield
-        rescue StandardError => e
-          raise e
-        end
-        raise ActiveRecord::Rollback
-      end
-      return_value
-    end
-  end
-
   def prefactory_lookup(key)
     @prefactory[key]
   end
@@ -66,8 +46,6 @@ module Prefactory
   end
 
   def self.included(base)
-    ActiveRecord::Base.send(:extend, ActiveRecordExtension)
-
     # Wrap outermost describe block in a transaction, so before(:all) data is rolled back at the end of this suite.
     base.before(:all) do
       clear_prefactory_map

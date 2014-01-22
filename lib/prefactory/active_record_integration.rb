@@ -1,6 +1,3 @@
-# Fire after commit callbacks in transactional specs
-# http://outofti.me/post/4777884779/test-after-commit-hooks-with-transactional-fixtures
-# https://gist.github.com/1169763
 require 'active_record/connection_adapters/abstract/database_statements'
 
 module ActiveRecord
@@ -8,8 +5,8 @@ module ActiveRecord
     module DatabaseStatements
 
       # Allow for setting a 'base' number of open transactions at which
-      # a commit should fire commit callbacks.  Useful for nesting shared-state
-      # transactions below individual tests, for e.g. performance.
+      # a commit should fire commit callbacks, when nesting transactional
+      # example groups.
 
       attr_writer :commit_at_open_transaction_level
 
@@ -35,6 +32,7 @@ module ActiveRecord
         return_value
       end
       alias_method_chain :transaction, :transactional_specs
+
     end
   end
 end
@@ -67,3 +65,26 @@ module ActiveRecord
     end
   end
 end
+
+require 'active_record/base'
+module WithDisposableTransactionExtension
+
+  # do a transaction with a silent rollback (unless another
+  # exception is doing a loud rollback already) and trigger
+  # commit logic for any transaction above this open-transaction level.
+  def with_disposable_transaction(&block)
+    return_value = nil
+    ActiveRecord::Base.connection.transaction(:requires_new => true) do
+      ActiveRecord::Base.connection.commit_at_open_transaction_level = ActiveRecord::Base.connection.open_transactions
+      begin
+        return_value = yield
+      rescue StandardError => e
+        raise e
+      end
+      raise ActiveRecord::Rollback
+    end
+    return_value
+  end
+
+end
+ActiveRecord::Base.send(:extend, WithDisposableTransactionExtension)
