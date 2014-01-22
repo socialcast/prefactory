@@ -28,6 +28,26 @@ describe "WithDisposableTransactionExtension#with_disposable_transaction" do
 end
 
 describe "Transactional wrapping" do
+  shared_examples_for "synthetic after_commit" do
+    it "calls after commit at this open transaction level, but not above" do
+      blog = Blog.create! :title => 'foo'
+      blog.called_after_commit.should == 1
+      blog.update_attributes! :title => 'bar'
+      blog.called_after_commit.should == 2
+      ActiveRecord::Base.connection.transaction(:requires_new => true) do
+        blog.update_attributes! :title => 'quux'
+        blog.called_after_commit.should == 2
+      end
+      blog.called_after_commit.should == 3
+      ActiveRecord::Base.connection.transaction(:requires_new => true) do
+        blog.update_attributes! :title => 'ragz'
+        blog.called_after_commit.should == 3
+        raise ActiveRecord::Rollback
+      end
+      blog.called_after_commit.should == 3
+    end
+  end
+
   it "wraps describe blocks in a savepoint transaction" do
     ActiveRecord::Base.connection.current_transaction.should be_a ActiveRecord::ConnectionAdapters::SavepointTransaction
   end
@@ -43,6 +63,7 @@ describe "Transactional wrapping" do
       ActiveRecord::Base.connection.commit_at_open_transaction_level.should == 2
     end
   end
+  it_behaves_like "synthetic after_commit"
 
   [:describe, :context].each do |nesting_method|
     send(nesting_method, "with a nested #{nesting_method}") do
@@ -59,6 +80,7 @@ describe "Transactional wrapping" do
           ActiveRecord::Base.connection.commit_at_open_transaction_level.should == 3
         end
       end
+      it_behaves_like "synthetic after_commit"
 
       [:describe, :context].each do |nesting_method|
         send(nesting_method, "with a nested #{nesting_method}") do
@@ -75,6 +97,7 @@ describe "Transactional wrapping" do
               ActiveRecord::Base.connection.commit_at_open_transaction_level.should == 4
             end
           end
+          it_behaves_like "synthetic after_commit"
         end
       end
     end
