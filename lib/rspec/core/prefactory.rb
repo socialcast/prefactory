@@ -46,6 +46,8 @@ module Prefactory
   end
 
   def self.included(base)
+    base.extend RSpecAroundAll
+
     # Wrap outermost describe block in a transaction, so before(:all) data is rolled back at the end of this suite.
     base.before(:all) do
       clear_prefactory_map
