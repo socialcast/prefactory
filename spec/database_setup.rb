@@ -2,7 +2,7 @@ require 'logger'
 require 'erb'
 config = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + '/database.yml')).result)
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
-ActiveRecord::Base.establish_connection(config[ENV['DB'] || 'sqlite'])
+ActiveRecord::Base.establish_connection(config[ENV['DB'] || 'sqlite3'])
 
 ActiveRecord::Schema.define(:version => 2) do
   create_table :blogs, :force => true do |t|

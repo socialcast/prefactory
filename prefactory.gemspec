@@ -20,8 +20,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rspec_around_all', '~> 0'
   spec.add_dependency 'activerecord', '~> 4'
-  spec.add_dependency 'sqlite3', '~> 1'
 
+  spec.add_development_dependency 'mysql2', '~> 0.3'
+  spec.add_development_dependency 'sqlite3', '~> 1'
   spec.add_development_dependency 'bundler', '~> 1'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'socialcast-git-extensions', '~> 3'
