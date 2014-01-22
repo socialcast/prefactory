@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rspec_around_all', '~> 0'
   spec.add_dependency 'activerecord', '~> 4'
+  spec.add_dependency 'factory_girl_rails', '~> 4'
 
   spec.add_development_dependency 'mysql2', '~> 0.3'
   spec.add_development_dependency 'sqlite3', '~> 1'

@@ -34,7 +34,7 @@ module Prefactory
     if block
       result = yield
     else
-      result = create(key, *args)
+      result = create(key, *args) if respond_to?(:create)
     end
     if result.present?
       @prefactory[key] = { :class => result.class, :id => result.id }

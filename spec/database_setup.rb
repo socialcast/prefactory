@@ -40,3 +40,12 @@ class Link < ActiveRecord::Base
   include CallbackMatcher::ActiveRecordHooks
 end
 
+FactoryGirl.define do
+  factory :blog, :aliases => [:another_blog] do
+    sequence(:title) { |n| "Title #{n}" }
+  end
+
+  factory :comment, :aliases => [:another_comment] do
+    sequence(:text) { |n| "Comment #{n}" }
+  end
+end

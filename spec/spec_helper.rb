@@ -13,9 +13,13 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require 'debugger'
+require 'factory_girl_rails'
 require 'support/callback_matcher'
 require 'active_record'
 require 'database_setup'
+RSpec.configure do |config|
+  config.include FactoryGirl::Syntax::Methods
+end
 
 unless ENV['NO_PREFACTORY']
   require 'prefactory'
