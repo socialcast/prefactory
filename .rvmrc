@@ -1,5 +1,4 @@
-PREFERRED_RUBY_VERSION=ruby-1.9.3-p484
-rvm use "${PREFERRED_RUBY_VERSION}@prefactory" --create
+rvm use "ruby-1.9.3-p484@prefactory" --create
 if ! command -v bundle ; then
   gem install bundler
   bundle install --local
