@@ -224,7 +224,7 @@ describe Prefactory do
 
   describe ".set!" do
     set!(:blog)
-    set!(:comment)
+    set! :comment, :counter => 12
     set!(:some_other_comment) do
       FactoryGirl.create :comment, :text => blog.title
     end
@@ -234,6 +234,7 @@ describe Prefactory do
     end
     it do
       comment.should be_present
+      comment.counter.should == 12
       Comment.where(:id => comment.id).should exist
     end
     it do
