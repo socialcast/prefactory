@@ -1,7 +1,28 @@
 require 'spec_helper'
 
-describe "FactoryGirl integration" do
-  describe "prefactory_add" do
+describe Prefactory do
+
+  describe "#in_before_all?" do
+    before(:all) do
+      @in_before_all = in_before_all?
+    end
+    before(:each) do
+      @in_before_each = in_before_all?
+    end
+    it "is only true when called inside a before(:all)" do
+      @in_before_all.should be_true
+      @in_before_each.should be_false
+      in_before_all?.should be_false # in this it-block context
+    end
+    after(:each) do
+      flunk if in_before_all?
+    end
+    after(:all) do
+      flunk if in_before_all?
+    end
+  end
+
+  describe "#prefactory_add" do
 
     context "when passing a block with no FactoryGirl activity" do
       before :all do
@@ -120,6 +141,105 @@ describe "FactoryGirl integration" do
       it "preserves the title" do
         blog.title.should == 'the big book of trains'
       end
+    end
+
+    context "when called in a context which is not a before-all context" do
+      before :all do
+        prefactory_add :blog
+      end
+      before do
+        @before_each_exception = nil
+        begin
+          prefactory_add(:another_blog)
+        rescue => e
+          @before_each_exception = e
+        end
+      end
+      it "raises an error in a before-each context" do
+        @before_each_exception.should be_present
+      end
+      it "raises an error in an it-context" do
+        expect { prefactory_add(:comment) }.to raise_error
+      end
+      it "works in a before-all context" do
+        prefactory(:blog).should be_present
+      end
+    end
+  end
+
+  describe "#prefactory and its method_missing :key fallback" do
+    before :all do
+      prefactory_add :blog
+    end
+    subject { prefactory(key) }
+    context "when passed a key associated with a prefactory_add'ed object" do
+      let(:key) { :blog }
+      it do
+        should be_present
+        should == blog
+        should be_a Blog
+      end
+      context "that has since been destroyed in a before-each" do
+        before { blog.destroy }
+        it do
+          should be_present
+          should be_destroyed
+          blog.should be_present
+          Blog.where(:id => blog.id).should_not exist
+        end
+      end
+      context "that has since been destroyed in a before-all" do
+        before(:all) { blog.destroy }
+        it { should be_nil }
+        it "does not raise an error when calling the key name as a method" do
+          blog.should be_nil
+        end
+      end
+    end
+    context "when passed a nonexistent key" do
+      let(:key) { :frog }
+      it do
+        should be_nil
+        expect { frog }.to raise_error(NameError)
+      end
+    end
+
+    context "with multiple before(:all) blocks" do
+      before(:all) { prefactory_add :blog }
+      before(:all) { prefactory_add :comment }
+      before(:all) { prefactory_add :another_blog, :title => blog.id.to_s }
+      it do
+        blog.should be_present
+        Blog.where(:id => blog.id).should exist
+      end
+      it do
+        comment.should be_present
+        Comment.where(:id => comment.id).should exist
+      end
+      it do
+        another_blog.title.should == blog.id.to_s
+      end
+    end
+  end
+
+  describe ".set!" do
+    set!(:blog)
+    set! :comment, :counter => 12
+    set!(:some_other_comment) do
+      FactoryGirl.create :comment, :text => blog.title
+    end
+    it do
+      blog.should be_present
+      Blog.where(:id => blog.id).should exist
+    end
+    it do
+      comment.should be_present
+      comment.counter.should == 12
+      Comment.where(:id => comment.id).should exist
+    end
+    it do
+      some_other_comment.text.should be_present
+      some_other_comment.text.should == blog.title
     end
   end
 end
