@@ -18,17 +18,14 @@ module Prefactory
     @prefactory_memo[key]
   end
 
-  def clear_prefactory_memoizations
-    @prefactory_memo = {}
-  end
-
-  def clear_prefactory_map
-    @prefactory = {}
+  def in_before_all?
+    @before_all_context
   end
 
   # prefabricate an object.  Can be passed any block that returns a class accessible by Klass.find(id),
   # or, if no block is passed, invokes create(key, options) to use e.g. a FactoryGirl factory of that key name.
   def prefactory_add(key, *args, &block)
+    raise "prefactory_add can only be used in a before(:all) context.  Change to a before(:all) or use let/let! instead." unless in_before_all?
     result = nil
     clear_prefactory_memoizations
     if block
@@ -85,9 +82,22 @@ module Prefactory
         end
         describe_without_transaction(*args, &modified_block)
       end
+
+      def before_with_detect_all_context(*args, &block)
+        before_all_context = (args.first == :all)
+        modified_block = proc do
+          @before_all_context = before_all_context
+          instance_eval(&block)
+          @before_all_context = nil
+        end
+        before_without_detect_all_context(*args, &modified_block)
+      end
+
       class << self
+        class_attribute :before_all_context
         alias_method_chain :describe, :transaction
         alias_method :context, :describe
+        alias_method_chain :before, :detect_all_context
       end
     end
 
@@ -105,4 +115,15 @@ module Prefactory
     end
 
   end
+
+  private
+
+  def clear_prefactory_memoizations
+    @prefactory_memo = {}
+  end
+
+  def clear_prefactory_map
+    @prefactory = {}
+  end
+
 end
