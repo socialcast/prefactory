@@ -203,12 +203,31 @@ describe Prefactory do
         expect { frog }.to raise_error(NameError)
       end
     end
+
+    context "with multiple before(:all) blocks" do
+      before(:all) { prefactory_add :blog }
+      before(:all) { prefactory_add :comment }
+      before(:all) { prefactory_add :another_blog, :title => blog.id.to_s }
+      it do
+        blog.should be_present
+        Blog.where(:id => blog.id).should exist
+      end
+      it do
+        comment.should be_present
+        Comment.where(:id => comment.id).should exist
+      end
+      it do
+        another_blog.title.should == blog.id.to_s
+      end
+    end
   end
 
-  context "with multiple before(:all) blocks" do
-    before(:all) { prefactory_add :blog }
-    before(:all) { prefactory_add :comment }
-    before(:all) { prefactory_add :another_blog, :title => blog.id.to_s }
+  describe ".set!" do
+    set!(:blog)
+    set!(:comment)
+    set!(:some_other_comment) do
+      FactoryGirl.create :comment, :text => blog.title
+    end
     it do
       blog.should be_present
       Blog.where(:id => blog.id).should exist
@@ -218,7 +237,8 @@ describe Prefactory do
       Comment.where(:id => comment.id).should exist
     end
     it do
-      another_blog.title.should == blog.id.to_s
+      some_other_comment.text.should be_present
+      some_other_comment.text.should == blog.title
     end
   end
 end

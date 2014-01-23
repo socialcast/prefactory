@@ -2,6 +2,7 @@ require 'prefactory/active_record_integration'
 require 'rspec_around_all'
 
 module Prefactory
+
   def prefactory_lookup(key)
     @prefactory[key]
   end
@@ -99,6 +100,14 @@ module Prefactory
         alias_method :context, :describe
         alias_method_chain :before, :detect_all_context
       end
+
+      def set!(key, *args, &set_block)
+        before(:all) do
+          modified_block = proc { instance_eval(&set_block) } if set_block
+          prefactory_add(key, *args, &modified_block)
+        end
+      end
+
     end
 
     # allow shorthand access to a prefabricated object
