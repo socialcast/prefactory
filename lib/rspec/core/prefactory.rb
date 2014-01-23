@@ -95,7 +95,6 @@ module Prefactory
       end
 
       class << self
-        class_attribute :before_all_context
         alias_method_chain :describe, :transaction
         alias_method :context, :describe
         alias_method_chain :before, :detect_before_all
