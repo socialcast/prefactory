@@ -30,11 +30,13 @@ describe User do
     prefactory_add :user
     prefactory_add(:friend) { create :user }
   end
+  set!(:other_friend) { create :user }
   context 'a new user has no friends' do
     it { user.friends.count.should == 0 }
     context 'after adding a friend a user has friends' do
       before { user.add_friend(friend) }
       it { user.friends.count.should == 1 }
+      it { user.friends.should_not include other_friend }
     end
   end
 end
