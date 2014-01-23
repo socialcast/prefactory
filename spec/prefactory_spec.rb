@@ -204,4 +204,21 @@ describe Prefactory do
       end
     end
   end
+
+  context "with multiple before(:all) blocks" do
+    before(:all) { prefactory_add :blog }
+    before(:all) { prefactory_add :comment }
+    before(:all) { prefactory_add :another_blog, :title => blog.id.to_s }
+    it do
+      blog.should be_present
+      Blog.where(:id => blog.id).should exist
+    end
+    it do
+      comment.should be_present
+      Comment.where(:id => comment.id).should exist
+    end
+    it do
+      another_blog.title.should == blog.id.to_s
+    end
+  end
 end
