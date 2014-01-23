@@ -18,7 +18,6 @@ Add this to your `spec_helper.rb`
 
 ``` ruby
 RSpec.configure do |config|
-  config.extend RSpecAroundAll
   config.include Prefactory
 end
 ```

@@ -34,7 +34,7 @@ module Prefactory
     if block
       result = yield
     else
-      result = create(key, *args)
+      result = create(key, *args) if respond_to?(:create)
     end
     if result.present?
       @prefactory[key] = { :class => result.class, :id => result.id }
@@ -46,6 +46,8 @@ module Prefactory
   end
 
   def self.included(base)
+    base.extend RSpecAroundAll
+
     # Wrap outermost describe block in a transaction, so before(:all) data is rolled back at the end of this suite.
     base.before(:all) do
       clear_prefactory_map

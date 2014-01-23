@@ -1,0 +1,10 @@
+sqlite3:
+  adapter: sqlite3
+  database: spec/<%= ENV['NO_PREFACTORY'] ? 'no_' : '' %>prefactory_test.sqlite3
+
+mysql2:
+  adapter: mysql2
+  database:  <%= ENV['NO_PREFACTORY'] ? 'no_' : '' %>prefactory_test
+  username: root
+  password:
+  host: localhost
