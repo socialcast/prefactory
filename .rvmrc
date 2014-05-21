@@ -1,4 +1,4 @@
-rvm use "ruby-1.9.3-p484@prefactory" --create
+rvm use "ruby-2.1.1@prefactory" --create
 if ! command -v bundle ; then
   gem install bundler
   bundle install --local
