@@ -3,6 +3,15 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'prefactory/version'
 
+active_record_version = case ENV["ACTIVE_RECORD_VERSION"].to_s
+                        when 'master'
+                          { github: "rails/activerecord" }
+                        when ''
+                          "~> 4"
+                        else
+                          "~> #{ENV['ACTIVE_RECORD_VERSION']}"
+                        end
+
 Gem::Specification.new do |spec|
   spec.name          = 'prefactory'
   spec.version       = Prefactory::VERSION
@@ -19,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'rspec_around_all', '~> 0'
-  spec.add_dependency 'activerecord', '~> 4'
+  spec.add_dependency 'activerecord', active_record_version
   spec.add_dependency 'factory_girl_rails', '~> 4'
 
   spec.add_development_dependency 'mysql2', '~> 0.3'
@@ -27,5 +36,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'socialcast-git-extensions', '~> 3'
-  spec.add_development_dependency 'debugger', '~> 1'
 end
