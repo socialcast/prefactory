@@ -35,8 +35,12 @@ end
 ``` ruby
 describe User do
   before :all do
-    prefactory_add :user                                   # invokes FactoryGirl.create(:user), reference as 'user'
-    prefactory_add(:friend) { FactoryGirl.create :user }   # invokes FactoryGirl.create(:user), reference as 'friend'
+    prefactory_add(:friend) { FactoryGirl.create :user }   # invokes FactoryGirl.create(:user), reference object as 'friend'
+
+    prefactory_add :user                                   # invokes create(:user) if available, e.g if
+                                                           # rspec is configured with:
+                                                           #   config.include FactoryGirl::Syntax::Methods
+                                                           # reference object as 'user' in examples
   end
   set!(:other_friend) { create :user }     # equivalent to before(:all) { prefactory_add(:other_friend) { create :user } }
   context 'a new user has no friends' do
