@@ -36,32 +36,48 @@ end
 
 ``` ruby
 describe User do
-  before :all do
-    prefactory_add(:friend) { FactoryGirl.create :user }   # invokes FactoryGirl.create(:user), reference object as 'friend'
+  before :all do   # executes once
 
-    prefactory_add :user                                   # invokes create(:user) if available, e.g if
-                                                           # rspec is configured with:
+    prefactory_add(:friend) { FactoryGirl.create :user }   # invokes FactoryGirl.create(:user)
+                                                           # reference object as 'friend'
+
+    prefactory_add :user                                   # invokes create(:user) if available, e.g
+                                                           # if rspec is configured with:
                                                            #   config.include FactoryGirl::Syntax::Methods
                                                            # reference object as 'user' in examples
   end
-  set!(:other_friend) { create :user }     # equivalent to before(:all) { prefactory_add(:other_friend) { create :user } }
+
+  set!(:other_friend) { create :user }     # convenience method, equivalent to:
+                                           # before(:all) do
+                                           #   prefactory_add(:other_friend) do
+                                           #     create :user
+                                           #   end
+                                           # end
+
   context 'a new user has no friends' do
+
     it { user.friends.count.should == 0 }
+
     context 'with a friend' do
       before(:all) { user.add_friend(friend) }   # executes once
+
       it { user.friends.count.should == 1 }
-      it "allows removing the friend" do
-        expect { user.remove_friend(friend) }.to_not raise_error     # this change will be transparently rolled back
+
+      it "allows removing the friend" do         # these changes will be transparently rolled back
+        expect { user.remove_friend(friend) }.to_not raise_error
         user.friends.count.should == 0
       end
+
       it "disallows adding the same friend again" do
         expect { user.add_friend(friend) }.to raise_error
         user.friends.count.should == 1
       end
-      it "allows adding a different friend" do
-        expect { user.add_friend(other_friend) }.to_not raise_error  # this change is transparently rolled back
+
+      it "allows adding a different friend" do   # these changes will be transparently rolled back
+        expect { user.add_friend(other_friend) }.to_not raise_error
         user.friends.count.should == 2
       end
+
       it { user.friends.should include friend }
       it { user.friends.should_not include other_friend }
     end
