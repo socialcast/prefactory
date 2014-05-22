@@ -22,6 +22,7 @@
 
 require 'rubygems'
 require 'bundler'
+require 'yaml'
 begin
   Bundler.setup
 rescue Bundler::BundlerError => e
@@ -34,7 +35,6 @@ require 'rspec/matchers'
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
-require 'debugger'
 require 'factory_girl_rails'
 require 'support/callback_matcher'
 require 'active_record'
