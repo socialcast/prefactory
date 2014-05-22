@@ -16,13 +16,15 @@ any data changes that occur during a specific test.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add the gem to the :test group in your Rails application's Gemfile:
 
 ```  ruby
-gem 'prefactory'
+group :test do
+  gem 'prefactory'
+end
 ```
 
-Add this to your `spec_helper.rb`
+Add this to your RSpec `spec_helper.rb`
 
 ``` ruby
 RSpec.configure do |config|
