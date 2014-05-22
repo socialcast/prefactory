@@ -12,7 +12,7 @@ any data changes that occur during a specific test.
 * ActiveRecord >= 4
 * RSpec
 * FactoryGirl
-* A database for which ActiveRecord supports [nested transactions|http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions] (e.g. MySQL, Postgresql)
+* A database for which ActiveRecord supports [nested transactions](http://api.rubyonrails.org/classes/ActiveRecord/Transactions/ClassMethods.html#module-ActiveRecord::Transactions::ClassMethods-label-Nested+transactions) (e.g. MySQL, Postgresql)
 
 ## Installation
 
