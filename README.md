@@ -31,6 +31,13 @@ Add this to your RSpec `spec_helper.rb`
 ``` ruby
 RSpec.configure do |config|
   config.include Prefactory
+
+  # ensure Rails' transaction fixtures are disabled
+  config.use_transactional_fixtures = false
+
+  # optional, to enable shorthand creation
+  # using only Factory name (see examples, below)
+  config.include FactoryGirl::Syntax::Methods
 end
 ```
 
@@ -40,21 +47,25 @@ end
 describe User do
   before :all do   # executes once
 
-    prefactory_add(:friend) { FactoryGirl.create :user }   # invokes FactoryGirl.create(:user)
-                                                           # reference object as 'friend'
+    # invokes FactoryGirl.create(:user)
+    # reference object as 'friend' in tests
+    prefactory_add(:friend) { FactoryGirl.create :user }
 
-    prefactory_add :user                                   # invokes create(:user) if available, e.g
-                                                           # if rspec is configured with:
-                                                           #   config.include FactoryGirl::Syntax::Methods
-                                                           # reference object as 'user' in examples
+    # invokes create(:user) if available, e.g
+    # if rspec is configured with:
+    #   config.include FactoryGirl::Syntax::Methods
+    # reference object as 'user' in examples
+    prefactory_add :user
+
   end
 
-  set!(:other_friend) { create :user }     # convenience method, equivalent to:
-                                           # before(:all) do
-                                           #   prefactory_add(:other_friend) do
-                                           #     create :user
-                                           #   end
-                                           # end
+  # convenience method, equivalent to:
+  # before(:all) do
+  #   prefactory_add(:other_friend) do
+  #     create :user
+  #   end
+  # end
+  set!(:other_friend) { create :user }
 
   context 'a new user has no friends' do
 
@@ -65,7 +76,8 @@ describe User do
 
       it { user.friends.count.should == 1 }
 
-      it "allows removing the friend" do         # these changes will be transparently rolled back
+      # these changes will be transparently rolled back
+      it "allows removing the friend" do
         expect { user.remove_friend(friend) }.to_not raise_error
         user.friends.count.should == 0
       end
@@ -75,7 +87,8 @@ describe User do
         user.friends.count.should == 1
       end
 
-      it "allows adding a different friend" do   # these changes will be transparently rolled back
+      # these changes will be transparently rolled back
+      it "allows adding a different friend" do
         expect { user.add_friend(other_friend) }.to_not raise_error
         user.friends.count.should == 2
       end
