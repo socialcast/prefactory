@@ -7,7 +7,8 @@ The ease and fidelity of factories with the performance of static fixtures.
 Prefactory allows you to create factory objects and perform other
 expensive ActiveRecord operations in RSpec before(:all) blocks, transparently
 wrapping example groups in nested transactions to automatically roll back
-any data changes that occur during a specific test.
+any data changes that occur during a specific test, while also ensuring
+after-commit callbacks are executed for the synthetic commits.
 
 ## Requirements
 
