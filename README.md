@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/socialcast/prefactory.png?branch=master)](http://travis-ci.org/socialcast/prefactory)
+
 # Prefactory
 
 The ease and fidelity of factories with the performance of static fixtures.
