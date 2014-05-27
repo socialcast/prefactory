@@ -42,7 +42,7 @@ RSpec.configure do |config|
 end
 ```
 
-## Example
+## Example Usage
 
 ``` ruby
 describe User do
@@ -100,6 +100,8 @@ describe User do
   end
 end
 ```
+
+See also:  [An example rails application with Prefactory configured](https://github.com/seanwalbran/prefactory-example)
 
 ## Contributing
 
