@@ -81,7 +81,7 @@ RSpec::Matchers.define :trigger_callbacks_for do |types|
     end
   }
 
-  match_for_should do |model_instance|
+  match do |model_instance|
     check_for_match.call(model_instance, types)
     result = true
     result = false unless @called.present?
@@ -89,7 +89,7 @@ RSpec::Matchers.define :trigger_callbacks_for do |types|
     result
   end
 
-  match_for_should_not do |model_instance|
+  match_when_negated do |model_instance|
     check_for_match.call(model_instance, types)
     result = true
     result = false unless @not_called.present?
@@ -97,11 +97,11 @@ RSpec::Matchers.define :trigger_callbacks_for do |types|
     result
   end
 
-  failure_message_for_should do |actual|
+  failure_message do |actual|
     ["Called:\t#{@called.join("\n\t")}", "Not called:\t#{@called.join("\n\t")}"].join("\n")
   end
 
-  failure_message_for_should_not do |actual|
+  failure_message_when_negated do |actual|
     ["Called:\t#{@called.join("\n\t")}", "Not called:\t#{@called.join("\n\t")}"].join("\n")
   end
 
