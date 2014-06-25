@@ -3,6 +3,13 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'prefactory/version'
 
+rspec_version = case ENV["RSPEC_VERSION"].to_s
+                when ''
+                  "~> 0"
+                else
+                  "~> #{ENV['RSPEC_VERSION']}"
+                end
+
 active_record_version = case ENV["ACTIVE_RECORD_VERSION"].to_s
                         when 'master'
                           { github: "rails/activerecord" }
@@ -28,6 +35,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'rspec_around_all', '~> 0'
+  spec.add_dependency 'rspec', rspec_version
   spec.add_dependency 'activerecord', active_record_version
   spec.add_dependency 'factory_girl_rails', '~> 4'
 
