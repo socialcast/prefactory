@@ -93,6 +93,7 @@ module Prefactory
     # are scoped only to the group.
     base.instance_eval do
       def describe_with_transaction(*args, &block)
+        original_caller = caller
         modified_block = proc do
           instance_eval do
             before(:all) { clear_prefactory_memoizations }
@@ -103,6 +104,14 @@ module Prefactory
           end
           instance_eval(&block)
         end
+
+        caller_metadata = { :caller => original_caller }
+        if args.last.is_a?(Hash)
+          args.last.merge!(caller_metadata)
+        else
+          args << caller_metadata
+        end
+
         describe_without_transaction(*args, &modified_block)
       end
 

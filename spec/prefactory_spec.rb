@@ -44,6 +44,23 @@ describe Prefactory do
     end
   end
 
+  describe "location metadata" do
+    context "with no other user metadata" do
+      it do
+        expect(RSpec.current_example.metadata[:location]).to include "prefactory_spec.rb"
+        expect(RSpec.current_example.metadata[:example_group][:location]).to include "prefactory_spec.rb"
+      end
+    end
+    context "with other user metadata", :foo => :bar, :baz => :bop do
+      it do
+        expect(RSpec.current_example.metadata[:location]).to include "prefactory_spec.rb"
+        expect(RSpec.current_example.metadata[:example_group][:location]).to include "prefactory_spec.rb"
+        expect(RSpec.current_example.metadata[:foo]).to eq(:bar)
+        expect(RSpec.current_example.metadata[:baz]).to eq(:bop)
+      end
+    end
+  end
+
   describe "#prefactory_add" do
 
     context "when passing a block with no FactoryGirl activity" do
