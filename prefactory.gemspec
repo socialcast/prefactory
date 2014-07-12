@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['developers@socialcast.com']
   spec.summary       = %q{Transaction-wrapped RSpec example groups with FactoryGirl integration}
   spec.description   = %q{Create factory objects in before-all blocks for fixture-like performance}
-  spec.homepage      = 'https://github.socialcast.com/prefactory'
+  spec.homepage      = 'https://github.com/socialcast/prefactory'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
