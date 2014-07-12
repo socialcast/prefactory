@@ -68,34 +68,34 @@ describe User do
   # end
   set!(:other_friend) { create :user }
 
-  context 'a new user has no friends' do
+  context 'a new user' do
 
-    it { user.friends.count.should == 0 }
+    it { expect(user.friends.count).to eq 0 }
 
     context 'with a friend' do
       before(:all) { user.add_friend(friend) }   # executes once
 
-      it { user.friends.count.should == 1 }
+      it { expect(user.friends.count).to eq 1 }
 
       # these changes will be transparently rolled back
       it "allows removing the friend" do
         expect { user.remove_friend(friend) }.to_not raise_error
-        user.friends.count.should == 0
+        expect(user.friends.count).to eq 0
       end
 
       it "disallows adding the same friend again" do
         expect { user.add_friend(friend) }.to raise_error
-        user.friends.count.should == 1
+        expect(user.friends.count).to eq 1
       end
 
       # these changes will be transparently rolled back
       it "allows adding a different friend" do
         expect { user.add_friend(other_friend) }.to_not raise_error
-        user.friends.count.should == 2
+        expect(user.friends.count).to eq 2
       end
 
-      it { user.friends.should include friend }
-      it { user.friends.should_not include other_friend }
+      it { expect(user.friends).to include friend }
+      it { expect(user.friends).not_to include other_friend }
     end
   end
 end
