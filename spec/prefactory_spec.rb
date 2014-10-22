@@ -281,4 +281,16 @@ describe Prefactory do
       expect(some_other_comment.text).to eq(blog.title)
     end
   end
+
+  describe "when the same key is overridden in different contexts at the same depth" do
+    set!(:some_blog) { create :blog, :title => 'original' }
+    it { expect(some_blog.title).to eq 'original' }
+    context "nested override" do
+      set!(:some_blog) { create :blog, :title => 'nested' }
+      it { expect(some_blog.title).to eq 'nested' }
+    end
+    context "nested unset" do
+      it { expect(some_blog.title).to eq 'original' }
+    end
+  end
 end
