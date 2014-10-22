@@ -22,23 +22,28 @@
 
 require 'prefactory/active_record_integration'
 require 'rspec_around_all'
+require 'prefactory/prefactory_lookup'
 
 module Prefactory
+  class NotDefined
+  end
 
   def prefactory_lookup(key)
-    @prefactory[key]
+    PrefactoryLookup.where(:key => key).first
   end
 
   # instantiate, or access an already-instantiated-and-memoized, prefabricated object.
   def prefactory(key)
-    lookup = prefactory_lookup(key)
-    return nil unless lookup.present?
     @prefactory_memo ||= {}
-    begin
-      @prefactory_memo[key] ||= lookup[:class].find(lookup[:id])
-    rescue
-    end
-    @prefactory_memo[key]
+    @prefactory_memo[key] ||= begin
+                                lookup = prefactory_lookup(key)
+                                if lookup.present?
+                                  lookup[:result_class].constantize.find(lookup[:result_id])
+                                else
+                                  Prefactory::NotDefined
+                                end
+                              rescue
+                              end
   end
 
   def in_before_all?
@@ -57,7 +62,11 @@ module Prefactory
       result = create(key, *args) if respond_to?(:create)
     end
     if result.present?
-      @prefactory[key] = { :class => result.class, :id => result.id }
+      PrefactoryLookup.where(:key => key).first_or_initialize.tap do |lookup|
+        lookup.result_class = result.class.name
+        lookup.result_id = result.id
+        lookup.save!
+      end
     else
       warn "WARNING: Failed to add #{key} to prefactory: block result not present"
     end
@@ -67,10 +76,10 @@ module Prefactory
 
   def self.included(base)
     base.extend RSpecAroundAll
+    PrefactoryLookup.create_table
 
     # Wrap outermost describe block in a transaction, so before(:all) data is rolled back at the end of this suite.
     base.before(:all) do
-      clear_prefactory_map
       clear_prefactory_memoizations
     end
     base.around(:all) do |group|
@@ -78,7 +87,6 @@ module Prefactory
     end
     base.after(:all) do
       clear_prefactory_memoizations
-      clear_prefactory_map
     end
 
     # Wrap each example in a transaction, instead of using Rails' transactional
@@ -145,11 +153,8 @@ module Prefactory
     # by invoking the 'prefactory' method.
     base.class_eval do
       def method_missing(key, *args, &block)
-        if prefactory_lookup(key)
-          prefactory(key)
-        else
-          super
-        end
+        result = prefactory(key)
+        result == Prefactory::NotDefined ? super : result
       end
     end
 
@@ -159,10 +164,6 @@ module Prefactory
 
   def clear_prefactory_memoizations
     @prefactory_memo = {}
-  end
-
-  def clear_prefactory_map
-    @prefactory = {}
   end
 
 end
