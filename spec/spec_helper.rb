@@ -23,7 +23,6 @@
 require 'rubygems'
 require 'bundler'
 require 'yaml'
-require 'byebug'
 begin
   Bundler.setup
 rescue Bundler::BundlerError => e

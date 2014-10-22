@@ -25,6 +25,8 @@ require 'rspec_around_all'
 require 'prefactory/prefactory_lookup'
 
 module Prefactory
+  class NotDefined
+  end
 
   def prefactory_lookup(key)
     PrefactoryLookup.where(:key => key).first
@@ -32,14 +34,16 @@ module Prefactory
 
   # instantiate, or access an already-instantiated-and-memoized, prefabricated object.
   def prefactory(key)
-    lookup = prefactory_lookup(key)
-    return nil unless lookup.present?
     @prefactory_memo ||= {}
-    begin
-      @prefactory_memo[key] ||= lookup[:result_class].constantize.find(lookup[:result_id])
-    rescue
-    end
-    @prefactory_memo[key]
+    @prefactory_memo[key] ||= begin
+                                lookup = prefactory_lookup(key)
+                                if lookup.present?
+                                  lookup[:result_class].constantize.find(lookup[:result_id])
+                                else
+                                  Prefactory::NotDefined
+                                end
+                              rescue
+                              end
   end
 
   def in_before_all?
@@ -149,11 +153,8 @@ module Prefactory
     # by invoking the 'prefactory' method.
     base.class_eval do
       def method_missing(key, *args, &block)
-        if prefactory_lookup(key)
-          prefactory(key)
-        else
-          super
-        end
+        result = prefactory(key)
+        result == Prefactory::NotDefined ? super : result
       end
     end
 

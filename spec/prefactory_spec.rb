@@ -238,7 +238,7 @@ describe Prefactory do
     context "when passed a nonexistent key" do
       let(:key) { :frog }
       it do
-        is_expected.to be_nil
+        is_expected.to eq Prefactory::NotDefined
         expect { frog }.to raise_error(NameError)
       end
     end
