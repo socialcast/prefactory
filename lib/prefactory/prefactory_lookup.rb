@@ -1,5 +1,4 @@
 class PrefactoryLookup < ActiveRecord::Base
-  class_attribute :table_created
   def self.create_table
     conn = ActiveRecord::Base.connection
     conn.create_table :prefactory_lookups, :force => true do |t|
