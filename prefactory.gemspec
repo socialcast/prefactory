@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rspec_around_all', '~> 0'
   spec.add_dependency('rspec', rspec_version) if rspec_version
   spec.add_dependency 'activerecord', active_record_version
+  spec.add_dependency 'railties', active_record_version
   spec.add_dependency 'factory_girl_rails', '~> 4'
 
   spec.add_development_dependency 'mysql2', '~> 0.3'
