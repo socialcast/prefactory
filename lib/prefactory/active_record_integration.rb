@@ -67,23 +67,47 @@ module ActiveRecord
       # If the savepoint was already released, we have an exception in an after-commit callback.
       # That means *this* transaction cannot and should not be rolled back, unlike the parent
       # transactions, which will roll back as the exception bubbles upwards.
-      def perform_rollback
-        unless @savepoint_already_released
-          connection.rollback_to_savepoint
-          rollback_records
+
+      if ActiveRecord.version.to_s.start_with?('4.2')
+        def rollback
+          unless @savepoint_already_released
+            connection.rollback_to_savepoint(savepoint_name)
+            super
+            rollback_records
+          end
+        end
+
+        def commit
+          connection.release_savepoint(savepoint_name)
+          super
+          if @fake_commit
+            @savepoint_already_released = true
+            commit_records
+          else
+            parent = connection.transaction_manager.current_transaction
+            records.each { |r| parent.add_record(r) }
+          end
+        end
+
+      else
+
+        def perform_rollback
+          unless @savepoint_already_released
+            connection.rollback_to_savepoint
+            rollback_records
+          end
+        end
+
+        def perform_commit
+          connection.release_savepoint
+          if @fake_commit
+            @savepoint_already_released = true
+            commit_records
+          else
+            records.each { |r| parent.add_record(r) }
+          end
         end
       end
-
-      def perform_commit
-        connection.release_savepoint
-        if @fake_commit
-          @savepoint_already_released = true
-          commit_records
-        else
-          records.each { |r| parent.add_record(r) }
-        end
-      end
-
     end
   end
 end
