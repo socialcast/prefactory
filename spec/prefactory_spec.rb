@@ -118,7 +118,7 @@ describe Prefactory do
         expect(some_other_blog.counter).to eq(24)
       end
     end
-    context "when the block returns something that does not respond_to? :id" do
+    context 'when the block returns something that does not respond_to? :id' do
       before :all do
         prefactory_add(:freeze_time) { Time.parse('2015-09-13 17:15') }
       end
