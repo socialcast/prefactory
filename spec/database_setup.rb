@@ -25,7 +25,7 @@ require 'erb'
 config = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + '/database.yml')).result)
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
 ActiveRecord::Base.establish_connection(config[ENV['DB'] || 'sqlite3'])
-ActiveRecord::Base.raise_in_transactional_callbacks = true
+ActiveRecord::Base.raise_in_transactional_callbacks = true if ActiveRecord::Base.respond_to?(:raise_in_transactional_callbacks)
 
 ActiveRecord::Schema.define(:version => 2) do
   create_table :blogs, :force => true do |t|
