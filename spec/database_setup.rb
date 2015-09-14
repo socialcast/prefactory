@@ -25,24 +25,25 @@ require 'erb'
 config = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + '/database.yml')).result)
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
 ActiveRecord::Base.establish_connection(config[ENV['DB'] || 'sqlite3'])
+ActiveRecord::Base.raise_in_transactional_callbacks = true
 
 ActiveRecord::Schema.define(:version => 2) do
   create_table :blogs, :force => true do |t|
     t.column :title, :string
     t.column :counter, :integer
-    t.timestamps
+    t.timestamps :null => false
   end
   create_table :comments, :force => true do |t|
     t.column :blog_id, :integer
     t.column :counter, :integer
     t.column :text, :string
-    t.timestamps
+    t.timestamps :null => false
   end
   create_table :links, :force => true do |t|
     t.column :blog_id, :integer
     t.column :counter, :integer
     t.column :name, :string
-    t.timestamps
+    t.timestamps :null => false
   end
 end
 

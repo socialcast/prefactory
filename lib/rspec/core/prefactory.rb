@@ -23,6 +23,7 @@
 require 'prefactory/active_record_integration'
 require 'rspec_around_all'
 require 'prefactory/prefactory_lookup'
+require 'yaml'
 
 module Prefactory
   class NotDefined
@@ -38,7 +39,11 @@ module Prefactory
     @prefactory_memo[key] ||= begin
                                 lookup = prefactory_lookup(key)
                                 if lookup.present?
-                                  lookup[:result_class].constantize.find(lookup[:result_id])
+                                  if lookup[:result_class]
+                                    lookup[:result_class].constantize.find(lookup[:result_id])
+                                  else
+                                    YAML.load(lookup[:result_value])
+                                  end
                                 else
                                   Prefactory::NotDefined
                                 end
@@ -62,10 +67,20 @@ module Prefactory
       result = create(key, *args) if respond_to?(:create)
     end
     if result.present?
-      PrefactoryLookup.where(:key => key).first_or_initialize.tap do |lookup|
-        lookup.result_class = result.class.name
-        lookup.result_id = result.id
-        lookup.save!
+      if result.respond_to?(:id)
+        PrefactoryLookup.where(:key => key).first_or_initialize.tap do |lookup|
+          lookup.result_class = result.class.name
+          lookup.result_id = result.id
+          lookup.result_value = nil
+          lookup.save!
+        end
+      else
+        PrefactoryLookup.where(:key => key).first_or_initialize.tap do |lookup|
+          lookup.result_class = nil
+          lookup.result_id = nil
+          lookup.result_value = YAML.dump(result)
+          lookup.save!
+        end
       end
     else
       warn "WARNING: Failed to add #{key} to prefactory: block result not present"
