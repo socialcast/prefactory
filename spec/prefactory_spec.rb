@@ -118,6 +118,15 @@ describe Prefactory do
         expect(some_other_blog.counter).to eq(24)
       end
     end
+    context 'when the block returns something that does not respond_to? :id' do
+      before :all do
+        prefactory_add(:freeze_time) { Time.parse('2015-09-13 17:15') }
+      end
+      it do
+        expect(freeze_time).to be_a Time
+        expect(freeze_time).to eq Time.parse('2015-09-13 17:15')
+      end
+    end
     context "when referencing the object within the before-all block" do
       before :all do
         prefactory_add :blog
@@ -198,7 +207,7 @@ describe Prefactory do
         expect(@before_each_exception).to be_present
       end
       it "raises an error in an it-context" do
-        expect { prefactory_add(:comment) }.to raise_error
+        expect { prefactory_add(:comment) }.to raise_error(/can only be used in a before\(:all\)/)
       end
       it "works in a before-all context" do
         expect(prefactory(:blog)).to be_present

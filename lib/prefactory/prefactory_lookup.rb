@@ -5,6 +5,7 @@ class PrefactoryLookup < ActiveRecord::Base
       t.column :key, :string
       t.column :result_class, :string
       t.column :result_id, :integer
+      t.column :result_value, :text
       t.index [:key], :unique => true
     end
   end
