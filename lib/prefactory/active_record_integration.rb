@@ -49,6 +49,7 @@ module ActiveRecord
           end
           if !rolled_back && open_transactions <= commit_at_open_transaction_level + 1
             current_transaction.instance_variable_set(:@fake_commit, true)
+            current_transaction.instance_variable_set(:@run_commit_callbacks, true)
           end
         end
         return_value
@@ -89,7 +90,7 @@ module ActiveRecord
           end
         end
 
-      else
+      elsif ActiveRecord.version.to_s.start_with?('4')
 
         def perform_rollback
           unless @savepoint_already_released

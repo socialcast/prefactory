@@ -13,7 +13,7 @@ active_record_version = case ENV["ACTIVE_RECORD_VERSION"].to_s
                         when 'master'
                           { github: "rails/activerecord" }
                         when ''
-                          "~> 4"
+                          ">= 4"
                         else
                           "~> #{ENV['ACTIVE_RECORD_VERSION']}"
                         end
@@ -42,6 +42,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mysql2', '~> 0.3'
   spec.add_development_dependency 'sqlite3', '~> 1'
   spec.add_development_dependency 'bundler', '~> 1'
-  spec.add_development_dependency 'rake', '~> 10.0'
-  spec.add_development_dependency 'socialcast-git-extensions', '~> 3'
+  spec.add_development_dependency 'rake', '>= 10.0'
+  spec.add_development_dependency 'socialcast-git-extensions', '>= 4'
 end
