@@ -103,11 +103,11 @@ end
 
 See also:  [An example rails application with Prefactory configured](https://github.com/seanwalbran/prefactory-example)
 
-If desired, it is also possible to only include the `set!` methods for e.g.
-specs that cannot use transactional isolation, like some threaded Capybara
-feature specs, or similar:
+If desired, it is also possible to only include the `set!` method and related
+lookup functionality for e.g. specs that cannot use transactional isolation
+(like some threaded Capybara feature specs, or similar):
 
-``` ruby
+```ruby
 RSpec.configure do |config|
   config.include Prefactory::Lookups
 end
