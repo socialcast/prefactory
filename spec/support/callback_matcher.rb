@@ -45,7 +45,8 @@ class CallbackMatcher
             }
           end
         end
-        alias_method_chain :initialize, :callback_init
+        alias_method :initialize_without_callback_init, :initialize
+        alias_method :initialize, :initialize_with_callback_init
       end
     end
 

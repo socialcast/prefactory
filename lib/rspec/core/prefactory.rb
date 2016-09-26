@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-require 'prefactory/active_record_integration'
 require 'rspec_around_all'
 require 'prefactory/prefactory_lookup'
 require 'yaml'
@@ -140,6 +139,7 @@ module Prefactory
 
   module Transactionality
     def self.included(base)
+      require 'prefactory/active_record_integration'
       base.extend RSpecAroundAll
       # Wrap outermost describe block in a transaction, so before(:all) data is rolled back at the end of this suite.
       base.before(:all) do
