@@ -54,7 +54,8 @@ module ActiveRecord
         end
         return_value
       end
-      alias_method_chain :transaction, :transactional_specs
+      alias_method :transaction_without_transactional_specs, :transaction
+      alias_method :transaction, :transaction_with_transactional_specs
 
     end
   end
